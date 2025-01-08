@@ -3,8 +3,8 @@
 const CACHE_VERSION = 'v2';
 const GLOBAL_CACHE_NAME = `global-cache-${CACHE_VERSION}`;
 const globalUrlsToCache = [
-  '/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-  '/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+  //'/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+  //'/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
   '/PWA-APP/IndexedDBManager.js',
   '/PWA-APP/icons/icon-192x192.png',
   '/PWA-APP/icons/icon-512x512.png',
