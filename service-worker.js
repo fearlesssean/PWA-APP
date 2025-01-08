@@ -1,7 +1,7 @@
 // Service Worker for Shared Use Across Multiple Apps
 
 // Base configuration
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 
 // Fetch event: Dynamically determine app-specific cache and scope
 self.addEventListener('fetch', (event) => {
