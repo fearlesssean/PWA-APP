@@ -82,7 +82,7 @@ window.getAllData = function () {
 
 //Register the service worker
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../service-worker.js', { scope: '/User-Manager2/' })
+    navigator.serviceWorker.register('../service-worker.js', { scope: '/PWA-APP/User-Manager2/' })
         .then((registration) => {
             console.log('Service Worker registered with scope:', registration.scope);
         })
