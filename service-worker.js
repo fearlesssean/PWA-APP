@@ -24,13 +24,13 @@ self.addEventListener('install', (event) => {
 function resolveAppData(requestUrl) {
   const pathSegments = requestUrl.pathname.split('/').filter(Boolean);
   const APP_NAME = pathSegments[1] || 'default-app'; // Assume second segment is app name
-  const APP_SCOPE = `/${APP_NAME}/`;
+  const APP_SCOPE = `/PWA-APP/${APP_NAME}/`;  // Adjust scope to match subfolder structure
   const CACHE_NAME = `${APP_NAME}-cache-${CACHE_VERSION}`;
   const urlsToCache = [
-    `/PWA-APP${APP_SCOPE}index.html`,
-    `/PWA-APP${APP_SCOPE}manifest.json`,
-    `/PWA-APP${APP_SCOPE}styles.css`,
-    `/PWA-APP${APP_SCOPE}app.js`,
+    `${APP_SCOPE}index.html`,
+    `${APP_SCOPE}manifest.json`,
+    `${APP_SCOPE}styles.css`,
+    `${APP_SCOPE}app.js`,
   ];
   return { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache };
 }
