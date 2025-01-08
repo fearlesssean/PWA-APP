@@ -1,6 +1,5 @@
 // Service Worker for Shared Use Across Multiple Apps
 
-// Base configuration
 const CACHE_VERSION = 'v2';
 const GLOBAL_CACHE_NAME = `global-cache-${CACHE_VERSION}`;
 const globalUrlsToCache = [
@@ -11,38 +10,24 @@ const globalUrlsToCache = [
   '/PWA-APP/icons/icon-512x512.png',
 ];
 
-// Global cache installation
 self.addEventListener('install', (event) => {
   console.log(`[Service Worker] Installing global resources`);
+
   event.waitUntil(
     caches.open(GLOBAL_CACHE_NAME).then((cache) => {
-      return cache.addAll(globalUrlsToCache);
+      return cache.addAll(globalUrlsToCache).catch((error) => {
+        console.error('[Service Worker] Failed to cache resources:', error);
+        throw error;
+      });
     })
   );
   self.skipWaiting();
 });
 
-// Dynamically resolve app-specific cache data
-function resolveAppData(requestUrl) {
-  const pathSegments = requestUrl.pathname.split('/').filter(Boolean);
-  const APP_NAME = pathSegments[1] || 'default-app'; // Assume second segment is app name
-  const APP_SCOPE = `/${APP_NAME}/`;
-  const CACHE_NAME = `${APP_NAME}-cache-${CACHE_VERSION}`;
-  const urlsToCache = [
-    `${APP_SCOPE}index.html`,
-    `${APP_SCOPE}manifest.json`,
-    `${APP_SCOPE}styles.css`,
-    `${APP_SCOPE}app.js`,
-  ];
-  return { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache };
-}
-
-// Fetch event
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
   const { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache } = resolveAppData(requestUrl);
 
-  // Cache global resources
   if (globalUrlsToCache.includes(requestUrl.pathname)) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
@@ -54,6 +39,9 @@ self.addEventListener('fetch', (event) => {
               cache.put(event.request, responseToCache);
             });
             return response;
+          }).catch((error) => {
+            console.error('[Service Worker] Failed to fetch global resource:', error);
+            throw error;
           })
         );
       })
@@ -67,7 +55,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Serve app-specific resources
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -82,7 +69,6 @@ self.addEventListener('fetch', (event) => {
             return response; // Return uncacheable response directly
           }
 
-          // Cache the response for future requests
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
@@ -98,7 +84,6 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Activate event: Clean up old caches
 self.addEventListener('activate', (event) => {
   console.log(`[Service Worker] Cleaning up old caches`);
   event.waitUntil(
