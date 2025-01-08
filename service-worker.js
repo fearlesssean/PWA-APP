@@ -12,6 +12,7 @@ self.addEventListener('fetch', (event) => {
   const APP_NAME = pathSegments[1] || 'default-app'; // Assume the second segment is the app name
   const APP_SCOPE = `/${APP_NAME}/`;
   const CACHE_NAME = `${APP_NAME}-cache-${CACHE_VERSION}`;
+  console.log(APP_NAME);
 
   const urlsToCache = [
     `${APP_SCOPE}index.html`,
