@@ -3,39 +3,52 @@
 // Base configuration
 const CACHE_VERSION = 'v2';
 
-// Fetch event: Dynamically determine app-specific cache and scope
-self.addEventListener('fetch', (event) => {
-  const requestUrl = new URL(event.request.url);
+// Global scope for dynamic mappings
+const appCaches = new Map();
 
-  // Dynamically determine APP_NAME and APP_SCOPE from the request URL
-  const pathSegments = requestUrl.pathname.split('/').filter(Boolean); // Remove empty segments
-  const APP_NAME = pathSegments[1] || 'default-app'; // Assume the second segment is the app name
+// Dynamically resolve cache data for apps
+function resolveAppData(requestUrl) {
+  const pathSegments = requestUrl.pathname.split('/').filter(Boolean);
+  const APP_NAME = pathSegments[1] || 'default-app'; // Assume second segment is app name
   const APP_SCOPE = `/${APP_NAME}/`;
   const CACHE_NAME = `${APP_NAME}-cache-${CACHE_VERSION}`;
-  console.log(APP_NAME);
-
   const urlsToCache = [
     `${APP_SCOPE}index.html`,
     `${APP_SCOPE}manifest.json`,
-    `icons/icon-192x192.png`,
-    `icons/icon-512x512.png`,
+    '/PWA-APP/icons/icon-192x192.png',
+    '/PWA-APP/icons/icon-512x512.png',
   ];
+  return { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache };
+}
 
-  // Install event: Cache resources for the app
-  self.addEventListener('install', (installEvent) => {
-    console.log(`[Service Worker] ${APP_NAME}: Install`);
-    installEvent.waitUntil(
+// Add install event handler dynamically for each app
+function registerInstallEvent({ CACHE_NAME, urlsToCache }) {
+  self.addEventListener('install', (event) => {
+    console.log(`[Service Worker] Install event for ${CACHE_NAME}`);
+    event.waitUntil(
       caches.open(CACHE_NAME).then((cache) => {
-        console.log(`[Service Worker] ${APP_NAME}: Caching resources`);
+        console.log(`[Service Worker] Caching resources for ${CACHE_NAME}`);
         return cache.addAll(urlsToCache);
       })
     );
     self.skipWaiting();
   });
+}
+
+// Fetch event: Dynamically determine app-specific cache and scope
+self.addEventListener('fetch', (event) => {
+  const requestUrl = new URL(event.request.url);
+  const { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache } = resolveAppData(requestUrl);
+
+  // Register install event dynamically if not already done for this app
+  if (!appCaches.has(APP_NAME)) {
+    appCaches.set(APP_NAME, true);
+    registerInstallEvent({ CACHE_NAME, urlsToCache });
+  }
 
   // Only handle requests within the app's scope
   if (!requestUrl.pathname.startsWith(APP_SCOPE)) {
-    console.log(`[Service Worker] ${APP_NAME}: Ignoring request outside app scope:`, requestUrl.pathname);
+    console.log(`[Service Worker] Ignoring request outside ${APP_NAME} scope:`, requestUrl.pathname);
     return;
   }
 
@@ -77,11 +90,10 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName.endsWith(`-cache-${CACHE_VERSION}`)) {
-            return null; // Keep caches for the current version
+          if (!cacheName.endsWith(`-cache-${CACHE_VERSION}`)) {
+            console.log(`[Service Worker] Deleting old cache:`, cacheName);
+            return caches.delete(cacheName);
           }
-          console.log(`[Service Worker] Deleting old cache:`, cacheName);
-          return caches.delete(cacheName);
         })
       );
     })
