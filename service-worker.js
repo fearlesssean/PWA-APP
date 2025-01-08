@@ -27,10 +27,10 @@ function resolveAppData(requestUrl) {
   const APP_SCOPE = `/${APP_NAME}/`;
   const CACHE_NAME = `${APP_NAME}-cache-${CACHE_VERSION}`;
   const urlsToCache = [
-    `/PWA-APP/${APP_SCOPE}index.html`,
-    `/PWA-APP/${APP_SCOPE}manifest.json`,
-    `/PWA-APP/${APP_SCOPE}styles.css`,
-    `/PWA-APP/${APP_SCOPE}app.js`,
+    `/PWA-APP${APP_SCOPE}index.html`,
+    `/PWA-APP${APP_SCOPE}manifest.json`,
+    `/PWA-APP${APP_SCOPE}styles.css`,
+    `/PWA-APP${APP_SCOPE}app.js`,
   ];
   return { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache };
 }
