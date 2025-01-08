@@ -2,7 +2,7 @@
     "name": "PWA-2",
     "short_name": "PWA-2",
     "description": "Test indexedDB from PWA-2",
-    "start_url": "/User-Manager2/index.html",
+    "start_url": "/PWA-APP/User-Manager2/index.html",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#4CAF50",
