@@ -10,17 +10,17 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="center">
-    <h1 class="text-center">IndexedDB Manager UI #2</h1>
+    <h1 class="text-center">PWA-2: User Manager</h1>
     <div class="container mt-5">
         <div class="mt-4 p-5 bg-dark text-white rounded">
             <h3>Add Data</h3>
             <div class="input-group mb-3">
-                <input class="form-control" type="text" id="addTitle" placeholder="Title" />
+                <span class="input-group-text">Name</span>
+                <input class="form-control" type="text" id="addName" placeholder="Name" />
             </div>
             <div class="input-group mb-3">
-                <span class="input-group-text">Set1</span>
-                <input class="form-control" type="number" id="addSet1" placeholder="Set 1" />
-                <span class="input-group-text">.LBS</span>
+                <span class="input-group-text">Age</span>
+                <input class="form-control" type="number" id="addAge" placeholder="Age" min="0"/>
             </div>
             <button class="btn btn-primary" onclick="addData()">Add</button>
         </div>

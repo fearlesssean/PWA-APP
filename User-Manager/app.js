@@ -17,9 +17,9 @@ async function main() {
 
 // Expose functions to the global scope
 window.addData = function () {
-    const title = document.getElementById("addTitle").value;
-    const set1 = parseInt(document.getElementById("addSet1").value, 10);
-    dbManager.add({ title, set1 }).then((id) => {
+    const name = document.getElementById("addName").value;
+    const age = parseInt(document.getElementById("addAge").value, 10);
+    dbManager.add({ name, age }).then((id) => {
         console.log(`Data added with ID: ${id}`);
     }).catch((error) => {
         console.error("Error adding data:", error);
@@ -37,9 +37,9 @@ window.getData = function () {
 
 window.updateData = function () {
     const id = parseInt(document.getElementById("updateId").value, 10);
-    const title = document.getElementById("updateTitle").value;
-    const set1 = parseInt(document.getElementById("updateSet1").value, 10);
-    dbManager.update({ id, title, set1 }).then(() => {
+    const name = document.getElementById("updateName").value;
+    const age = parseInt(document.getElementById("updateAge").value, 10);
+    dbManager.update({ id, name, age }).then(() => {
         console.log(`Data with ID ${id} updated`);
     }).catch((error) => {
         console.error("Error updating data:", error);
@@ -69,8 +69,8 @@ window.getAllData = function () {
             userDiv.classList.add('user-item'); // Optional: for styling
             userDiv.innerHTML = `
                 <hr>
-                <h3>${user.title}</h3>
-                <p>Set 1: ${user.set1}</p>
+                <h3>${user.name}</h3>
+                <p>Age: ${user.age}</p>
                 <p>ID: ${user.id}</p>
             `;
             dataList.appendChild(userDiv);
