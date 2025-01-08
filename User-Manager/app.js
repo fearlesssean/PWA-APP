@@ -91,5 +91,29 @@ if ('serviceWorker' in navigator) {
         });
 }
 
+// Install button script
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    document.getElementById('install-button').style.display = 'block';
+});
+
+document.getElementById('install-button').addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response: ${outcome}`);
+        deferredPrompt = null;
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    console.log('PWA-APP installed');
+    document.getElementById('install-button').style.display = 'none';
+});
+
+
 // Run the main function
 main();
