@@ -2,11 +2,27 @@
 
 // Base configuration
 const CACHE_VERSION = 'v2';
+const GLOBAL_CACHE_NAME = `global-cache-${CACHE_VERSION}`;
+const globalUrlsToCache = [
+  '/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+  '/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+  '/PWA-APP/IndexedDBManager.js',
+  '/PWA-APP/icons/icon-192x192.png',
+  '/PWA-APP/icons/icon-512x512.png',
+];
 
-// Global scope for dynamic mappings
-const appCaches = new Map();
+// Global cache installation
+self.addEventListener('install', (event) => {
+  console.log(`[Service Worker] Installing global resources`);
+  event.waitUntil(
+    caches.open(GLOBAL_CACHE_NAME).then((cache) => {
+      return cache.addAll(globalUrlsToCache);
+    })
+  );
+  self.skipWaiting();
+});
 
-// Dynamically resolve cache data for apps
+// Dynamically resolve app-specific cache data
 function resolveAppData(requestUrl) {
   const pathSegments = requestUrl.pathname.split('/').filter(Boolean);
   const APP_NAME = pathSegments[1] || 'default-app'; // Assume second segment is app name
@@ -15,44 +31,43 @@ function resolveAppData(requestUrl) {
   const urlsToCache = [
     `${APP_SCOPE}index.html`,
     `${APP_SCOPE}manifest.json`,
-    '/PWA-APP/icons/icon-192x192.png',
-    '/PWA-APP/icons/icon-512x512.png',
+    `${APP_SCOPE}styles.css`,
+    `${APP_SCOPE}app.js`,
   ];
   return { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache };
 }
 
-// Add install event handler dynamically for each app
-function registerInstallEvent({ CACHE_NAME, urlsToCache }) {
-  self.addEventListener('install', (event) => {
-    console.log(`[Service Worker] Install event for ${CACHE_NAME}`);
-    event.waitUntil(
-      caches.open(CACHE_NAME).then((cache) => {
-        console.log(`[Service Worker] Caching resources for ${CACHE_NAME}`);
-        return cache.addAll(urlsToCache);
-      })
-    );
-    self.skipWaiting();
-  });
-}
-
-// Fetch event: Dynamically determine app-specific cache and scope
+// Fetch event
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
   const { APP_NAME, APP_SCOPE, CACHE_NAME, urlsToCache } = resolveAppData(requestUrl);
 
-  // Register install event dynamically if not already done for this app
-  if (!appCaches.has(APP_NAME)) {
-    appCaches.set(APP_NAME, true);
-    registerInstallEvent({ CACHE_NAME, urlsToCache });
+  // Cache global resources
+  if (globalUrlsToCache.includes(requestUrl.pathname)) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        return (
+          cachedResponse ||
+          fetch(event.request).then((response) => {
+            const responseToCache = response.clone();
+            caches.open(GLOBAL_CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+            return response;
+          })
+        );
+      })
+    );
+    return;
   }
 
-  // Only handle requests within the app's scope
+  // Ignore requests outside app scope
   if (!requestUrl.pathname.startsWith(APP_SCOPE)) {
     console.log(`[Service Worker] Ignoring request outside ${APP_NAME} scope:`, requestUrl.pathname);
     return;
   }
 
-  // Serve cached resources or fetch from network
+  // Serve app-specific resources
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -90,7 +105,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (!cacheName.endsWith(`-cache-${CACHE_VERSION}`)) {
+          if (!cacheName.endsWith(`-cache-${CACHE_VERSION}`) && cacheName !== GLOBAL_CACHE_NAME) {
             console.log(`[Service Worker] Deleting old cache:`, cacheName);
             return caches.delete(cacheName);
           }
