@@ -3,7 +3,7 @@ let dbManager; // Declare dbManager globally
 
 async function main() {
     try {
-        const module = await import('../IndexedDBManager.js'); // Dynamically import the module
+        const module = await import('/PWA-APP/assets/js/IndexedDBManager.js'); // Dynamically import the module
         IndexedDBManager = module.IndexedDBManager; // Assign the exported class to a variable
 
         // Initialize the database
@@ -82,13 +82,10 @@ window.getAllData = function () {
 
 //Register the service worker
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../service-worker.js', { scope: '/PWA-APP/User-Manager/' })
-        .then((registration) => {
-            console.log('Service Worker registered with scope:', registration.scope);
-        })
-        .catch((error) => {
-            console.error('Service Worker registration failed:', error);
-        });
+    navigator.serviceWorker
+        .register('/sw.js')
+        .then(() => console.log('Service Worker Registered'))
+        .catch((err) => console.error('Service Worker Registration Failed:', err));
 }
 
 // Install button script
