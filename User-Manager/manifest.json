@@ -1,6 +1,6 @@
 {
     "name": "PWA-1",
-    "short_name": "PWA-1",
+    "short_name": "User-Manager",
     "description": "Test indexedDB from PWA-1",
     "theme_color": "#4CAF50",
     "background_color": "#ffffff",
