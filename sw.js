@@ -64,7 +64,7 @@ self.addEventListener('activate', (event) => {
             const validCacheNames = manifestUrls.map((url) =>
               `${CACHE_PREFIX}${url.split('/').slice(-2, -1)[0]}`
             );
-
+            console.log(validCacheNames);
             return cacheNames.map((cacheName) => {
               if (!validCacheNames.includes(cacheName)) {
                 return caches.delete(cacheName);
