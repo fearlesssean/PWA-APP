@@ -59,19 +59,25 @@ self.addEventListener('activate', (event) => {
     fetch('/PWA-APP/manifest-list.json') // Fetch updated list of manifests
       .then((response) => response.json())
       .then((manifestUrls) =>
-        Promise.all(
-          caches.keys().then((cacheNames) => {
-            const validCacheNames = manifestUrls.map((url) =>
-              `${CACHE_PREFIX}${url.split('/').slice(-2, -1)[0]}`
-            );
-            console.log(validCacheNames);
-            return cacheNames.map((cacheName) => {
+        caches.keys().then((cacheNames) => {
+          const validCacheNames = manifestUrls.map((url) =>
+            `${CACHE_PREFIX}${url.split('/').slice(-2, -1)[0]}`
+          );
+
+          // Debugging logs
+          console.log('Cache Names:', cacheNames);
+          console.log('Manifest URLs:', manifestUrls);
+          console.log('Valid Cache Names:', validCacheNames);
+
+          return Promise.all(
+            cacheNames.map((cacheName) => {
               if (!validCacheNames.includes(cacheName)) {
+                console.log(`Deleting old cache: ${cacheName}`);
                 return caches.delete(cacheName);
               }
-            });
-          })
-        )
+            })
+          );
+        })
       )
   );
 });
