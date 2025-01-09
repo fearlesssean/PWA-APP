@@ -80,14 +80,6 @@ window.getAllData = function () {
     });
 };
 
-//Register the service worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-        .register('/sw.js')
-        .then(() => console.log('Service Worker Registered'))
-        .catch((err) => console.error('Service Worker Registration Failed:', err));
-}
-
 // Install button script
 let deferredPrompt;
 
@@ -111,6 +103,13 @@ window.addEventListener('appinstalled', () => {
     document.getElementById('install-button').style.display = 'none';
 });
 
+//Register the service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/PWA-APP/sw.js')
+        .then(() => console.log('Service Worker Registered'))
+        .catch((err) => console.error('Service Worker Registration Failed:', err));
+}
 
 // Run the main function
 main();
