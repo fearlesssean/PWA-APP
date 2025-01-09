@@ -1,4 +1,5 @@
 [
-    "/User-Manager/manifest.json",
-    "/User-Manager2/manifest.json"
+    "/PWA-APP/Dashboard/manifest.json",
+    "/PWA-APP/User-Manager/manifest.json",
+    "/PWA-APP/User-Manager2/manifest.json"
 ]

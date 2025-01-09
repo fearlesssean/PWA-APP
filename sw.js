@@ -2,7 +2,7 @@ const CACHE_PREFIX = 'pwa-cache-';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    fetch('/manifest-list.json') // Fetch the list of app manifests
+    fetch('manifest-list.json') // Fetch the list of app manifests
       .then((response) => response.json())
       .then(async (manifestUrls) => {
         for (const manifestUrl of manifestUrls) {
@@ -56,7 +56,7 @@ self.addEventListener('fetch', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    fetch('/manifest-list.json') // Fetch updated list of manifests
+    fetch('manifest-list.json') // Fetch updated list of manifests
       .then((response) => response.json())
       .then((manifestUrls) =>
         Promise.all(
